@@ -1,0 +1,75 @@
+.env
+venv/
+__pycache__/
+*.pyc
+exports/
+.DS_Store
+
+
+# ===== Secretos / credenciales =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+service-account*.json
+ 
+# ===== Entornos virtuales =====
+venv/
+.venv/
+env/
+ENV/
+ 
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+ 
+# ===== Tests / cobertura / linters =====
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+ 
+# ===== Jupyter =====
+.ipynb_checkpoints/
+ 
+# ===== Datos y exports del MCP =====
+exports/
+*.csv
+*.parquet
+*.xlsx
+*.tmp
+ 
+# ===== Logs =====
+*.log
+logs/
+ 
+# ===== Backups (p. ej. claude_desktop_config.json.bak) =====
+*.bak
+*.orig
+ 
+# ===== IDEs / editores =====
+.vscode/
+.idea/
+*.swp
+*~
+ 
+# ===== Sistema operativo =====
+Thumbs.db
+desktop.ini
+.DS_Store
+$RECYCLE.BIN/

@@ -1,0 +1,9 @@
+# Núcleo (servidor MCP)
+fastmcp>=2.0
+python-dotenv>=1.0
+pyodbc>=5.0
+
+# Opcional: solo si vas a usar api.py (wrapper REST de respaldo)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.0
