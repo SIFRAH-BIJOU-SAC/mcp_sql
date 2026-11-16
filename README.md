@@ -8,15 +8,15 @@ Code) o a cualquier otro agente compatible con MCP.
 
 ## ✦ 1. Arquitectura y archivos
 
-| Archivo | Responsabilidad |
-|---|---|
-| `config.py` | Carga y valida `.env` (credenciales, timeouts, límites). |
-| `sql_guard.py` | Bloquea cualquier sentencia que no sea `SELECT`/`WITH` (defensa en profundidad). |
-| `db.py` | Conexión a SQL Server, ejecución de consultas y exportación a CSV. |
-| `jobs.py` | Registro en memoria de consultas que quedaron corriendo en segundo plano (ver §7). |
-| `engine.py` | Lógica de timeout/job/payloads **compartida** entre `server.py` y `api.py`. |
-| `server.py` | **Servidor MCP** (FastMCP): tools, recurso de esquema, healthcheck. |
-| `api.py` | Wrapper **opcional** en FastAPI (REST) sobre el mismo motor — ver §10. |
+| Archivo                              | Responsabilidad                                                                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `config.py`                        | Carga y valida `.env` (credenciales, timeouts, límites).                                              |
+| `sql_guard.py`                     | Bloquea cualquier sentencia que no sea `SELECT`/`WITH` (defensa en profundidad).                     |
+| `db.py`                            | Conexión a SQL Server, ejecución de consultas y exportación a CSV.                                    |
+| `jobs.py`                          | Registro en memoria de consultas que quedaron corriendo en segundo plano (ver §7).                      |
+| `engine.py`                        | Lógica de timeout/job/payloads **compartida** entre `server.py` y `api.py`.                   |
+| `server.py`                        | **Servidor MCP** (FastMCP): tools, recurso de esquema, healthcheck.                                |
+| `api.py`                           | Wrapper **opcional** en FastAPI (REST) sobre el mismo motor — ver §10.                           |
 | `schema/glosario_tablas_sifrah.md` | Tu glosario de tablas, servido como *recurso MCP* para que el agente lo lea antes de escribir queries. |
 
 ```
@@ -81,14 +81,14 @@ Esto además expone `GET /health` para monitoreo (ver §8).
 
 ## ✦ 5. Herramientas (tools) expuestas
 
-| Tool | Qué hace |
-|---|---|
-| `run_query(sql, max_rows, output_format)` | Ejecuta un `SELECT`/`WITH` y devuelve una vista previa en línea (JSON o Markdown). Si tarda demasiado, ver "Consultas largas" abajo. |
+| Tool                                          | Qué hace                                                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `run_query(sql, max_rows, output_format)`   | Ejecuta un `SELECT`/`WITH` y devuelve una vista previa en línea (JSON o Markdown). Si tarda demasiado, ver "Consultas largas" abajo.        |
 | `export_query_csv(sql, filename, max_rows)` | Ejecuta un `SELECT`/`WITH` grande y lo guarda como `.csv` en el servidor; devuelve la ruta. También puede pasar a segundo plano si tarda. |
-| `get_query_result(job_id)` | Recoge el resultado de una consulta que quedó corriendo en segundo plano. |
-| `list_jobs()` | Lista las consultas en curso o recién terminadas (por si perdiste el `job_id`). |
-| `list_tables(schema)` | Lista tablas/vistas del esquema (`INFORMATION_SCHEMA.TABLES`). |
-| `describe_table(table_name)` | Columnas reales de una tabla (`INFORMATION_SCHEMA.COLUMNS`) — para confirmar los tipos que tu glosario marca como "inferidos". |
+| `get_query_result(job_id)`                  | Recoge el resultado de una consulta que quedó corriendo en segundo plano.                                                                       |
+| `list_jobs()`                               | Lista las consultas en curso o recién terminadas (por si perdiste el `job_id`).                                                               |
+| `list_tables(schema)`                       | Lista tablas/vistas del esquema (`INFORMATION_SCHEMA.TABLES`).                                                                                 |
+| `describe_table(table_name)`                | Columnas reales de una tabla (`INFORMATION_SCHEMA.COLUMNS`) — para confirmar los tipos que tu glosario marca como "inferidos".                |
 
 Además, el **recurso** `schema://sifrah_dwh/glosario` sirve el contenido de
 `schema/glosario_tablas_sifrah.md` tal cual, para que el agente lo lea como
@@ -116,7 +116,6 @@ convenciones como `[Año]`, sufijos `_V2`, `Flag_*`, etc.).
 
    Un filtro por texto (`sql_guard.py`) siempre puede tener puntos ciegos; un
    permiso a nivel de base de datos, no. Usa ambos.
-
 3. `ALLOW_WRITE_QUERIES=false` por defecto en `.env`. Solo cámbialo si de
    verdad necesitas permitir escritura, y aun así se siguen bloqueando `DROP`,
    `TRUNCATE`, `ALTER`, `BACKUP`, `RESTORE`, `SHUTDOWN`.
@@ -129,10 +128,10 @@ convenciones como `[Año]`, sufijos `_V2`, `Flag_*`, etc.).
 
 Hay dos límites de tiempo distintos, y es importante no confundirlos:
 
-| Variable | Qué limita | Súbela si... |
-|---|---|---|
-| `DB_QUERY_TIMEOUT_S` | Cuánto puede durar la consulta **en SQL Server** (límite real). | Tus reportes pesados legítimamente tardan minutos (ej. `300` para 5 min). |
-| `MCP_HARD_TIMEOUT_S` | Cuánto espera el **agente** una respuesta síncrona antes de dejar de esperar. | Casi nunca — déjalo bajo (20-30s) a propósito, ver abajo. |
+| Variable               | Qué limita                                                                           | Súbela si...                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `DB_QUERY_TIMEOUT_S` | Cuánto puede durar la consulta **en SQL Server** (límite real).               | Tus reportes pesados legítimamente tardan minutos (ej. `300` para 5 min). |
+| `MCP_HARD_TIMEOUT_S` | Cuánto espera el **agente** una respuesta síncrona antes de dejar de esperar. | Casi nunca — déjalo bajo (20-30s) a propósito, ver abajo.                 |
 
 **¿Por qué no simplemente subir `MCP_HARD_TIMEOUT_S` a 5 minutos?** Porque para
 el usuario que está chateando con el agente, un tool call que tarda 5 minutos
@@ -166,6 +165,7 @@ cancele la tarea — el hilo sigue vivo y se guarda en un registro en memoria
 asumió) que esto funciona incluso a través del protocolo MCP real.
 
 **Limitaciones honestas:**
+
 - El registro de jobs vive en memoria del proceso: si el servidor se
   reinicia, los jobs en curso o recién terminados se pierden.
 - No hay cancelación real de una consulta ya en curso en SQL Server (eso
@@ -231,6 +231,17 @@ ejemplo:
     }
   }
 }
+
+
+### example
+
+  "mcpServers": {
+    "sifrah-sql-dwh": {
+      "command": "C:\\Users\\user\\Documents\\MCP\\sifrah_mcp_sql\\venv\\Scripts\\python.exe",
+      "args": ["C:\\Users\\user\\Documents\\MCP\\sifrah_mcp_sql\\server.py"]
+    }
+  },
+ 
 ```
 
 En Claude Code también puedes usar el CLI (`claude mcp add ...`). ⚠️ No tengo
@@ -290,5 +301,3 @@ job en segundo plano" de la sección anterior) aplican igual que en `server.py`.
 - Si despliegas esto en GCP (Cloud Run, GKE, una VM), usa Secret Manager para
   `DB_USER`/`DB_PASSWORD` en vez de un `.env` plano, e inyecta esos valores
   como variables de entorno en el contenedor.
-
- 
